@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
+import { Http } from '@angular/http'; //inject to constructor
 import { Order } from "./order"
+import 'rxjs/add/operator/toPromise'
+import 'rxjs/add/operator/map'
+import { Operator, Observable } from "rxjs"
 import { OrderItem } from "./order-item"
+
 
 const ORDERS = [
       new Order([
@@ -27,10 +32,14 @@ const ORDERS = [
     ]
 
 const LOCAL_KEY:string = "order_key"
+
+
+const URL:string = "data/orders.json"   //path of file back end 
 @Injectable()
 export class OrderService {
    
-  constructor() {
+  //  private http:Http
+  constructor(private http:Http) {
     //make everytime we call this service load all data to _orders 
     this.load();
   }
@@ -89,7 +98,7 @@ export class OrderService {
       //   }
       
       this._orders[index] = order;
-        
+
       this.save();
   }
 
@@ -106,6 +115,38 @@ export class OrderService {
     } )
     return orders;
   }
+
+
+  laodDataFromURL():Promise<Array<Order>>{
+  return  this.http.get(URL).toPromise().then(resp =>{
+      this._orders = this.loadData(resp.json())
+      this.save();
+      return this._orders;
+    })
+  }
+
+  // getOrderFromURL(callBack:Function){
+  //   this.http.get(URL).subscribe(data =>{
+  //     console.log(data)
+  //     console.log(data.json())
+  //     this._orders = this.loadData(data.json());
+  //     callBack(this._orders);
+  //     this.save();
+  //   })
+  // }
+
+// usinf promise method
+//   getOrderFromURL():Promise<Array<Order>>{
+//     return this.http.get(URL).toPromise()
+//         .then( resp=> this.loadData( resp.json()) )
+//         .catch (reason => [])
+//   }
+
+getOrderFromURL(): Observable<Array<Order>>{
+  return this.http.get(URL).map(resp =>{
+    return this.loadData(resp.json())
+  })
+}
 
 
 }
