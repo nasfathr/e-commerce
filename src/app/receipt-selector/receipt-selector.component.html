@@ -1,0 +1,11 @@
+<table class="table">
+    <tr *ngFor="let item of orders">
+        <td>
+            <a routerLink ="../recipt/{{item.id}}">{{item.id}}</a>
+
+            <a routerLink ="../editor/{{item.id}}" class="btn btn-primary">Edit</a>
+        </td>
+        <td>{{item.getTotal()}}</td>
+    </tr>
+
+</table>
